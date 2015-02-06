@@ -20,5 +20,10 @@
   "bugs": {
     "url": "https://github.com/dvberkel/JS1k.2015/issues"
   },
-  "homepage": "https://github.com/dvberkel/JS1k.2015"
+  "homepage": "https://github.com/dvberkel/JS1k.2015",
+  "devDependencies": {
+    "node-minify": "^1.0.1",
+    "q": "^1.1.2",
+    "q-io": "^1.11.6"
+  }
 }
