@@ -33,38 +33,36 @@
 	    this.emit('moved', oldX, oldY);
     }
 
-    function backgroundData(scale){
+    function imageData(width, height, scale, color, data){
         scale = scale || 1;
         var canvas = document.createElement('canvas');
-        canvas.width = 8 * scale;
-        canvas.height = 6 * scale;
+        canvas.width = width * scale;
+        canvas.height = height * scale;
         var context = canvas.getContext('2d');
         context.beginPath();
         context.moveTo(0, 0);
-        [
-            [8, 0],
-            [8, 6],
-            [0, 6],
-        ].map(function(data){
-            return { x: data[0] * scale, y: data[1] * scale }
+        data.map(function(d){
+            return { x: d[0] * scale, y: d[1] * scale }
         }).forEach(function(point){
             context.lineTo(point.x, point.y);
         });
         context.closePath();
-        context.fillStyle = 'white';
+        context.fillStyle = color;
         context.fill();
         return context.getImageData(0, 0, canvas.width, canvas.height);
     }
 
+
+    function backgroundData(scale){
+        return imageData(8, 6, scale, 'white', [
+            [8, 0],
+            [8, 6],
+            [0, 6],
+        ]);
+    }
+
     function trainData(scale){
-        scale = scale || 1;
-        var canvas = document.createElement('canvas');
-        canvas.width = 8 * scale;
-        canvas.height = 6 * scale;
-        var context = canvas.getContext('2d');
-        context.beginPath();
-        context.moveTo(0, 0);
-        [
+        return imageData(8, 6, scale, 'black', [
             [4, 0],
             [4, 3],
             [6, 3],
@@ -88,15 +86,7 @@
             [1, 6],
             [1, 1],
             [0, 1],
-        ].map(function(data){
-            return { x: data[0] * scale, y: data[1] * scale }
-        }).forEach(function(point){
-            context.lineTo(point.x, point.y);
-        });
-        context.closePath();
-        context.fillStyle = 'black';
-        context.fill();
-        return context.getImageData(0, 0, canvas.width, canvas.height);
+        ]);
     }
 
     var TrainView = function(model, canvas, context){
