@@ -5,7 +5,7 @@
   "description": "A shot at the JS1k.2015 competition",
   "main": "JS1k.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "minify": "node minify.js"
   },
   "repository": {
     "type": "git",
