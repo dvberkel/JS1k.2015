@@ -1,52 +1,125 @@
 ;(function(body, canvas, context, undefined){
     var Point = function(x, y){
-	this.x = x;
-	this.y = y;
+	    this.x = x;
+	    this.y = y;
     };
     Point.prototype.translate = function(dx, dy){
-	this.x += dx;
-	this.y += dy;
+	    this.x += dx;
+	    this.y += dy;
     };
 
     var Observable = function(){
-	this.observers = {};
+	    this.observers = {};
     };
     Observable.prototype.on = function(event, observer){
-	(this.observers[event] = this.observers[event] || []).push(observer);
+	    (this.observers[event] = this.observers[event] || []).push(observer);
     };
     Observable.prototype.emit = function(event){
-	var args = Array.prototype.slice.call(arguments, 1);
-	(this.observers[event] || []).forEach(function(observer){
-	    observer.apply(undefined, args);
-	});
+	    var args = Array.prototype.slice.call(arguments, 1);
+	    (this.observers[event] || []).forEach(function(observer){
+	        observer.apply(undefined, args);
+	    });
     };
 
     var Train = function(startPosition){
-	Observable.call(this);
-	this.position =  startPosition || new Point(0, 0);
+	    Observable.call(this);
+	    this.position =  startPosition || new Point(0, 0);
     };
     Train.prototype = Object.create(Observable.prototype);
     Train.prototype.move = function(){
-	this.position.translate(1, 1);
-	this.emit('moved');
+        var oldX = this.position.x;
+        var oldY = this.position.y;
+	    this.position.translate(1, 1);
+	    this.emit('moved', oldX, oldY);
+    }
+
+    function backgroundData(scale){
+        scale = scale || 1;
+        var canvas = document.createElement('canvas');
+        canvas.width = 8 * scale;
+        canvas.height = 6 * scale;
+        var context = canvas.getContext('2d');
+        context.beginPath();
+        context.moveTo(0, 0);
+        [
+            [8, 0],
+            [8, 6],
+            [0, 6],
+        ].map(function(data){
+            return { x: data[0] * scale, y: data[1] * scale }
+        }).forEach(function(point){
+            context.lineTo(point.x, point.y);
+        });
+        context.closePath();
+        context.fillStyle = 'white';
+        context.fill();
+        return context.getImageData(0, 0, canvas.width, canvas.height);
+    }
+
+    function trainData(scale){
+        scale = scale || 1;
+        var canvas = document.createElement('canvas');
+        canvas.width = 8 * scale;
+        canvas.height = 6 * scale;
+        var context = canvas.getContext('2d');
+        context.beginPath();
+        context.moveTo(0, 0);
+        [
+            [4, 0],
+            [4, 3],
+            [6, 3],
+            [6, 1],
+            [7, 1],
+            [7, 3],
+            [8, 3],
+            [8, 6],
+            [7, 6],
+            [7, 5],
+            [6, 5],
+            [6, 6],
+            [5, 6],
+            [5, 5],
+            [4, 5],
+            [4, 6],
+            [3, 6],
+            [3, 5],
+            [2, 5],
+            [2, 6],
+            [1, 6],
+            [1, 1],
+            [0, 1],
+        ].map(function(data){
+            return { x: data[0] * scale, y: data[1] * scale }
+        }).forEach(function(point){
+            context.lineTo(point.x, point.y);
+        });
+        context.closePath();
+        context.fillStyle = 'black';
+        context.fill();
+        return context.getImageData(0, 0, canvas.width, canvas.height);
     }
 
     var TrainView = function(model, canvas, context){
-	this.model = model;
-	this.context = context;
-	this.model.on('moved', this.update.bind(this));
-	this.update();
+	    this.model = model;
+	    this.context = context;
+	    this.model.on('moved', this.update.bind(this));
+        this.backgroundData = backgroundData(10);
+        this.trainData = trainData(10);
+	    this.update();
     };
-    TrainView.prototype.update = function(){
-	this.context.fillRect(this.model.position.x, this.model.position.y, 5, 5);
+    TrainView.prototype.update = function(x, y){
+        x = x || 0;
+        y = y || 0;
+        this.context.putImageData(this.backgroundData, x, y);
+        this.context.putImageData(this.trainData, this.model.position.x, this.model.position.y);
     };
 
     var train = new Train(new Point(50, 50));
     new TrainView(train, canvas, context);
 
     function animate(){
-	train.move();
-	requestAnimationFrame(animate);
+	    train.move();
+	    requestAnimationFrame(animate);
     }
     animate();
 })(window.b, window.a, window.c);
