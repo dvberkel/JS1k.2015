@@ -24,16 +24,19 @@
     var Train = function(position, target){
 	    Observable.call(this);
 	    this.position =  position || new Point(0, 0);
-        this.target = target || new Point(0, 0);
+        this._target = target || new Point(0, 0);
     };
     Train.prototype = Object.create(Observable.prototype);
     Train.prototype.move = function(){
         var x = this.position.x;
         var y = this.position.y;
-        var dx = this.target.x - x;
-        var dy = this.target.y - y;
+        var dx = this._target.x - x;
+        var dy = this._target.y - y;
 	    this.position.translate(dx/100, dy/100);
 	    this.emit('moved', x, y);
+    }
+    Train.prototype.target = function(x, y){
+        this._target = new Point(x, y);
     }
 
     function imageData(width, height, scale, color, data){
@@ -115,4 +118,8 @@
 	    requestAnimationFrame(animate);
     }
     animate();
+
+    canvas.addEventListener('mousemove', function(e){
+        train.target(e.clientX, e.clientY);
+    });
 })(window.b, window.a, window.c);
