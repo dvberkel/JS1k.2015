@@ -21,16 +21,19 @@
 	    });
     };
 
-    var Train = function(startPosition){
+    var Train = function(position, target){
 	    Observable.call(this);
-	    this.position =  startPosition || new Point(0, 0);
+	    this.position =  position || new Point(0, 0);
+        this.target = target || new Point(0, 0);
     };
     Train.prototype = Object.create(Observable.prototype);
     Train.prototype.move = function(){
-        var oldX = this.position.x;
-        var oldY = this.position.y;
-	    this.position.translate(1, 1);
-	    this.emit('moved', oldX, oldY);
+        var x = this.position.x;
+        var y = this.position.y;
+        var dx = this.target.x - x;
+        var dy = this.target.y - y;
+	    this.position.translate(dx/100, dy/100);
+	    this.emit('moved', x, y);
     }
 
     function imageData(width, height, scale, color, data){
@@ -104,7 +107,7 @@
         this.context.putImageData(this.trainData, this.model.position.x, this.model.position.y);
     };
 
-    var train = new Train(new Point(50, 50));
+    var train = new Train(new Point(50, 50), new Point(150, 100));
     new TrainView(train, canvas, context);
 
     function animate(){
