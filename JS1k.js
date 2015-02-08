@@ -3,40 +3,40 @@
 	    this.x = x;
 	    this.y = y;
     };
-    Point.prototype.translate = function(dx, dy){
+    Point.prototype.tr = function(dx, dy){
 	    this.x += dx;
 	    this.y += dy;
     };
 
     var Observable = function(){
-	    this.observers = {};
+	    this.o = {};
     };
     Observable.prototype.on = function(event, observer){
-	    (this.observers[event] = this.observers[event] || []).push(observer);
+	    (this.o[event] = this.o[event] || []).push(observer);
     };
-    Observable.prototype.emit = function(event){
+    Observable.prototype.e = function(event){
 	    var args = Array.prototype.slice.call(arguments, 1);
-	    (this.observers[event] || []).forEach(function(observer){
+	    (this.o[event] || []).forEach(function(observer){
 	        observer.apply(undefined, args);
 	    });
     };
 
     var Train = function(position, target){
 	    Observable.call(this);
-	    this.position =  position || new Point(0, 0);
-        this._target = target || new Point(0, 0);
+	    this.p =  position || new Point(0, 0);
+        this._t = target || new Point(0, 0);
     };
     Train.prototype = Object.create(Observable.prototype);
     Train.prototype.move = function(){
-        var x = this.position.x;
-        var y = this.position.y;
-        var dx = this._target.x - x;
-        var dy = this._target.y - y;
-	    this.position.translate(dx/100, dy/100);
-	    this.emit('moved', x, y);
+        var x = this.p.x;
+        var y = this.p.y;
+        var dx = this._t.x - x;
+        var dy = this._t.y - y;
+	    this.p.tr(dx/100, dy/100);
+	    this.e('moved', x, y);
     }
     Train.prototype.target = function(x, y){
-        this._target = new Point(x, y);
+        this._t = new Point(x, y);
     }
 
     function imageData(width, height, scale, color, data){
@@ -96,18 +96,18 @@
     }
 
     var TrainView = function(model, canvas, context){
-	    this.model = model;
-	    this.context = context;
-	    this.model.on('moved', this.update.bind(this));
-        this.backgroundData = backgroundData(10);
-        this.trainData = trainData(10);
+	    this.m = model;
+	    this.c = context;
+	    this.m.on('moved', this.update.bind(this));
+        this.b = backgroundData(10);
+        this.t = trainData(10);
 	    this.update();
     };
     TrainView.prototype.update = function(x, y){
         x = x || 0;
         y = y || 0;
-        this.context.putImageData(this.backgroundData, x, y);
-        this.context.putImageData(this.trainData, this.model.position.x, this.model.position.y);
+        this.c.putImageData(this.b, x, y);
+        this.c.putImageData(this.t, this.m.p.x, this.m.p.y);
     };
 
     var train = new Train(new Point(50, 50), new Point(150, 100));
