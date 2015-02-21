@@ -33,7 +33,7 @@
         var dx = this._t.x - x;
         var dy = this._t.y - y;
 	    this.p.tr(dx/100, dy/100);
-	    this.e('moved', x, y);
+	    this.e('m', x, y);
     }
     Train.prototype.target = function(x, y){
         this._t = new Point(x, y);
@@ -98,7 +98,7 @@
     var TrainView = function(model, canvas, context){
 	    this.m = model;
 	    this.c = context;
-	    this.m.on('moved', this.update.bind(this));
+	    this.m.on('m', this.update.bind(this));
         this.b = backgroundData(10);
         this.t = trainData(10);
 	    this.update();
